@@ -1,0 +1,32 @@
+[
+    {
+        "Employee_ID":1,
+        "Department":"Sales",
+        "Revenue":5000,
+        "Name":"Alice"
+    },
+    {
+        "Employee_ID":2,
+        "Department":"Marketing",
+        "Revenue":7000,
+        "Name":"Bob"
+    },
+    {
+        "Employee_ID":3,
+        "Department":"Sales",
+        "Revenue":6000,
+        "Name":"Charlie"
+    },
+    {
+        "Employee_ID":4,
+        "Department":"Sales",
+        "Revenue":3000,
+        "Name":"David"
+    },
+    {
+        "Employee_ID":5,
+        "Department":"Marketing",
+        "Revenue":8000,
+        "Name":"Eve"
+    }
+]

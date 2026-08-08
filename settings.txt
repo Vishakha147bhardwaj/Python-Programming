@@ -1,0 +1,3 @@
+theme=dark
+threads=4
+cache=true

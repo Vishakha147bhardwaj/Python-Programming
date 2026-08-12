@@ -10,7 +10,9 @@ SELECT category, COUNT(sale_id), SUM(price)
 FROM sales
 GROUP BY category
 """)
-
+# 0        1     2
+# clothing 3     80
+# shoes    2     200
 rows = cursor.fetchall()
 
 print("--- Sales Breakdown By Category ---")

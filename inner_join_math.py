@@ -63,13 +63,17 @@ INNER JOIN rankings
 ON keywords.keyword_id = rankings.keyword_id
 WHERE rankings.google_position <= 10;
 """)
+# keyword_text         google_position   click_rate
+# air jordan 1 retro     3                 15.00
+# organic espresso beans   7                 20.00
+# home workout equipment   1                 41.67
 
 # ---------------------------------------------------------
 # STEP 5: Display the Results
 # ---------------------------------------------------------
 print("=== Top 10 Ranking Keywords ===")
 print("-" * 65)
-
+# results = cursor.fetchall()
 for keyword, position, click_rate in cursor.fetchall():
     print(f"Keyword         : {keyword}")
     print(f"Google Position : {position}")

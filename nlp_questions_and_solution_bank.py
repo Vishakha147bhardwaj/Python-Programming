@@ -87,7 +87,8 @@ print(extract_nouns_and_verbs(test_sentence))
 
 
 
-# Question 4: Brand and Location Extraction via NER (Medium)Write a function 
+# Question 4: Brand and Location Extraction via NER (Medium)
+# Write a function 
 # parse_web_copy_entities(web_text) using spaCy to scan a text block. Isolate and 
 # return a dictionary containing two distinct sets: Organizations/Brands (ORG) and 
 # Geographical Locations (GPE).

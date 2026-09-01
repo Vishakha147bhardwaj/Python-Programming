@@ -262,3 +262,169 @@ comp_site = [
 ]
 print("Missing Topics:", find_content_gaps(my_site, comp_site))
 # Expected Gaps: ['Advanced technical conversion rate optimization', 'A/B testing landing page layouts']
+
+# 📊 Sentiment Analysis & Text Classification
+# 1. Rule-Based Sentiment: Processing Feedback with VADER 🟢 (Easy)
+# Problem Statement:
+# When building lightweight monitoring systems, rule-based lexicon matchers
+#  are preferred for speed. Write a Python function called analyze_vader_sentiment(text)
+#  that uses the vaderSentiment package. It should analyze a string and return the string 
+# keyword "Positive", "Negative", or "Neutral" based on the following standard compound score thresholds:
+# Positive: compound score >= 0.05
+# Negative: compound score <= -0.05
+# Neutral: Everything in between.
+
+# Solution:
+# First ensure you have it installed: pip install vaderSentiment
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+def analyze_vader_sentiment(text):
+    analyzer = SentimentIntensityAnalyzer()
+    # Fetch the intensity score dictionary
+    scores = analyzer.polarity_scores(text)
+    compound_score = scores['compound']
+    
+    # Classify based on standard VADER thresholds
+    if compound_score >= 0.05:
+        return "Positive"
+    elif compound_score <= -0.05:
+        return "Negative"
+    else:
+        return "Neutral"
+
+# Testing the implementation
+print(analyze_vader_sentiment("This new LLM updates are absolutely incredible!")) 
+# Output: Positive
+print(analyze_vader_sentiment("The latency is terrible and it keeps crashing."))   
+# Output: Negative
+
+# 2. Extracting Subjectivity with TextBlob 🟢 (Easy)
+# Problem Statement:
+# To filter objective user search queries from subjective reviews, you need to extract
+#  meta-metrics. Write a function called get_text_subjectivity(text) using the TextBlob library.
+#  The function should analyze a text block and return its raw subjectivity float score 
+# (which spans from 0.0 for pure fact to 1.0 for pure opinion).
+
+# Solution:
+# First ensure you have it installed: pip install textblob
+from textblob import TextBlob
+
+def get_text_subjectivity(text):
+    blob = TextBlob(text)
+    # TextBlob sentiment returns a named tuple: (polarity, subjectivity)
+    return blob.sentiment.subjectivity
+
+# Testing the implementation
+fact_text = "The Python language was created by Guido van Rossum."
+opinion_text = "Python is the most beautiful and perfect language ever."
+
+print(f"Fact Subjectivity: {get_text_subjectivity(fact_text)}")
+# Output: Fact Subjectivity: 0.0 (Objective fact)
+print(f"Opinion Subjectivity: {get_text_subjectivity(opinion_text)}")
+# Output: Opinion Subjectivity: 0.75 (Highly subjective opinion)
+
+# 3. Pipeline Deployment: Hugging Face Transformers 🟡 (Medium)
+# Problem Statement:
+# Rule-based tools struggle with nuance, sarcasm, or context. Use the Hugging Face transformers 
+# library to initialize a standard deep learning pipeline for 'sentiment-analysis'. Write a function
+#  deep_analyze_sentiment(text_list) that takes a list of text strings, passes them through a pre-trained
+#  Transformer model pipeline, and extracts only the text label ('POSITIVE' or 'NEGATIVE') for each input 
+# into a flat list.
+
+# Solution:
+# First ensure you have them installed: pip install transformers torch
+from transformers import pipeline
+
+# Initialize the pipeline once globally to avoid reloading models constantly
+sentiment_pipeline = pipeline('sentiment-analysis')
+
+def deep_analyze_sentiment(text_list):
+    results = sentiment_pipeline(text_list)
+    # Extract only the 'LABEL' value from the generated dictionaries
+    return [item['label'] for item in results]
+
+# Testing the implementation
+sentences = [
+    "I'm not saying it's bad, but I definitely wouldn't buy it again.",
+    "This solution works flawlessly!"
+]
+print(deep_analyze_sentiment(sentences))
+# Output: ['NEGATIVE', 'POSITIVE']
+
+# 4. Rule-Based Routing: Classifying Search Intent 🟡 (Medium)
+# Problem Statement:
+# Before hitting an expensive LLM, routing search engine phrases can save massive costs. 
+# Create a function classify_search_intent(query) that flags basic user search intents 
+# using simple keyword checking. 
+# Classify into three buckets:transactional: 
+# If the query contains words like "buy", "price", "discount", or "order".
+# navigational: If the query contains platform names like "login", "signin", "download", or "homepage".
+# informational: If it doesn't match the above and contains question words like "how", "what", "why", or "guide".
+# Return "unknown" if no matches occur.
+
+# Solution:
+def classify_search_intent(query):
+    # Normalize input for matching uniformity
+    query_lower = query.lower()
+    
+    # Keyword list definitions
+    transactional_keywords = ["buy", "price", "discount", "order", "cost"]
+    navigational_keywords = ["login", "signin", "download", "homepage"]
+    informational_keywords = ["how", "what", "why", "guide", "tutorial"]
+    
+    # Conditional checks
+    if any(word in query_lower for word in transactional_keywords):
+        return "transactional"
+    elif any(word in query_lower for word in navigational_keywords):
+        return "navigational"
+    elif any(word in query_lower for word in informational_keywords):
+        return "informational"
+    else:
+        return "unknown"
+
+# Testing the implementation
+print(classify_search_intent("Where can I buy a cheap mechanical keyboard?")) # Output: transactional
+print(classify_search_intent("JupyterLab login dashboard"))                   # Output: navigational
+print(classify_search_intent("How to build a custom transformer network"))    # Output: informational
+
+# 5. Intent Routing to Agent Pipelines 🟡 (Medium)
+# Problem Statement:
+# Combine classification and modular architecture. Create a class QueryRouter. It should have an instance method route_query(user_query).
+# First, use the structural heuristic logic from Question 4 to determine the user's intent.
+# Next, return a string that instructs an downstream engine where to deliver the data.
+# If "transactional", return "Sent to Sales Pipeline".
+# If "informational", return "Sent to Knowledge Base RAG Pipeline".
+# For everything else, return "Sent to General Help Desk Queue".
+
+# Solution:
+
+class QueryRouter:
+    def __init__(self):
+        pass
+        
+    def _get_intent(self, text):
+        # Internal helper method implementing search routing heuristics
+        text = text.lower()
+        if any(w in text for w in ["buy", "price", "purchase"]):
+            return "transactional"
+        elif any(w in text for w in ["how", "what", "explain", "tutorial"]):
+            return "informational"
+        return "other"
+        
+    def route_query(self, user_query):
+        intent = self._get_intent(user_query)
+        
+        # Determine target system execution based on classification
+        if intent == "transactional":
+            return "Sent to Sales Pipeline"
+        elif intent == "informational":
+            return "Sent to Knowledge Base RAG Pipeline"
+        else:
+            return "Sent to General Help Desk Queue"
+
+# Testing the implementation
+router = QueryRouter()
+print(router.route_query("What is the difference between VADER and HuggingFace?"))
+# Output: Sent to Knowledge Base RAG Pipeline
+print(router.route_query("Purchase premium API access keys"))
+# Output: Sent to Sales Pipeline

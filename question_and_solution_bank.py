@@ -170,3 +170,242 @@ async def run_parallel_scrapers() -> list:
 
 # Test execution runner context
 # print(asyncio.run(run_parallel_scrapers()))
+
+
+# 📥 OOP — Part 1: Core Components & Agent Skeletons(Classes, __init__, self, attributes, methods, and an Agent class skeleton)
+
+# 1. The Setup: Creating the Basic Agent Skeleton 🟢 (Easy)
+# Problem Statement:
+# Create a foundational Agent class. 
+# It should accept two arguments upon initialization: name (a string) and model (a string like "gpt-4").
+#  Store these as instance variables. Add an instance method called introduce() that returns a string 
+# formatted exactly like: "Hello, I am Agent [name] powered by [model]."
+
+# Solution:
+class Agent:
+    def __init__(self, name, model):
+        self.name = name
+        self.model = model
+        
+    def introduce(self):
+        return f"Hello, I am Agent {self.name} powered by {self.model}."
+
+# Testing the implementation
+my_agent = Agent(name="Nexus", model="Claude-3")
+print(my_agent.introduce())
+# Output: Hello, I am Agent Nexus powered by Claude-3.
+
+# 2. Monitoring Costs: State Management with Attributes 🟡 (Medium)
+# Problem Statement:
+# AI agents accumulate runtime costs. Modify or write an Agent class that starts with an internal
+#  counter tracking total API tokens processed (total_tokens). Initialize it to 0. Create a method
+#  called process_request(tokens_used) that accepts an integer, adds it to the running total, and 
+# returns the updated total_tokens.
+
+# Solution:
+class Agent:
+    def __init__(self, name):
+        self.name = name
+        self.total_tokens = 0  # Initialized to zero automatically
+        
+    def process_request(self, tokens_used):
+        self.total_tokens += tokens_used
+        return self.total_tokens
+
+# Testing the implementation
+runner = Agent("TaskBot")
+runner.process_request(150)
+runner.process_request(250)
+print(f"Tokens consumed: {runner.total_tokens}")
+# Output: Tokens consumed: 400
+
+# 3. Agent Personality: Dynamic Attributes via self 🟢 (Easy)
+# Problem Statement:
+# Create a PersonaAgent class. In its initialization, accept a parameter called temperature 
+# (a float representing creativity). Write a method called set_creativity(new_temp) that allows 
+# you to dynamically modify this property on the active instance using self.
+
+# Solution:
+class PersonaAgent:
+    def __init__(self, temperature):
+        self.temperature = temperature
+        
+    def set_creativity(self, new_temp):
+        self.temperature = new_temp
+
+# Testing the implementation
+agent = PersonaAgent(0.2)
+print(f"Original: {agent.temperature}") # Output: 0.2
+agent.set_creativity(0.7)
+print(f"Updated: {agent.temperature}")  # Output: 0.7
+
+
+# 4. Memory Log: Appending to List Attributes 🟡 (Medium)
+# Problem Statement:Agents need conversation history. Create an AgentWithMemory class.
+#  Initialize a property called chat_history as an empty list inside __init__. Write a method 
+# remember(role, message) that creates a dictionary keying those two strings (e.g., {"role": role, "message": message}) 
+# and appends it to the memory history list.
+
+# Solution:
+class AgentWithMemory:
+    def __init__(self):
+        self.chat_history = [] # Dynamic collection tracking state
+        
+    def remember(self, role, message):
+        turn = {"role": role, "message": message}
+        self.chat_history.append(turn)
+
+# Testing the implementation
+brain = AgentWithMemory()
+brain.remember("user", "What is 2+2?")
+brain.remember("assistant", "It is 4.")
+print(brain.chat_history)
+# Output: [{'role': 'user', 'message': 'What is 2+2?'}, {'role': 'assistant', 'message': 'It is 4.'}]
+
+
+# 5. Final Assembly: The Full AI Agent Action Loop 🟡 (Medium)
+# Problem Statement:
+# Build a cohesive ActionAgent that tracks context and performs operations.
+#  The agent should contain an initialization parameter system_prompt. 
+# Write a method called execute(user_input) that returns a formatted string simulating an 
+# AI output combination: "System: [system_prompt] | User: [user_input] -> Executing response..."
+
+# Solution:
+class ActionAgent:
+    def __init__(self, system_prompt):
+        self.system_prompt = system_prompt
+        
+    def execute(self, user_input):
+        return f"System: {self.system_prompt} | User: {user_input} -> Executing response..."
+
+# Testing the implementation
+coder_agent = ActionAgent("You are a senior python engineer.")
+result = coder_agent.execute("Write a loop.")
+print(result)
+# Output: System: You are a senior python engineer. | User: Write a loop. -> Executing response...
+
+
+# 🧬 OOP — Part 2: Advanced Mechanics & Extensibility(Inheritance, super(), encapsulation, dunder methods, and Polymorphism for plugins)
+# 6. Specialization: Utilizing super() in Inheritance 🟢 (Easy)
+# Problem Statement:
+# You have a base class BaseAgent with an __init__ that takes a name.
+#  Create a child class called VisionAgent that inherits from BaseAgent. 
+# Use super().__init__(name) to properly initialize the base name attribute, but also accept and
+#  assign a unique subclass attribute called camera_resolution (a string).
+
+# Solution:
+class BaseAgent:
+    def __init__(self, name):
+        self.name = name
+
+class VisionAgent(BaseAgent):
+    def __init__(self, name, camera_resolution):
+        # Call the parent constructor to set up the inherited property
+        super().__init__(name)
+        self.camera_resolution = camera_resolution
+
+# Testing the implementation
+eye_bot = VisionAgent("Argus", "4K")
+print(f"Agent {eye_bot.name} operates at resolution {eye_bot.camera_resolution}.")
+# Output: Agent Argus operates at resolution 4K.
+
+
+# 7. Protecting Secrets: Variable Encapsulation 🟡 (Medium)
+# Problem Statement:
+# AI tools require private API keys. 
+# Create a class SecureClient that encapsulates an API token. Use Python's double underscore 
+# prefix convention (__api_key) to make it a private attribute upon construction. Implement a 
+# getter method called get_secure_masked_key() that returns only the first 4 characters followed by ****.
+
+# Solution:
+
+class SecureClient:
+    def __init__(self, secret_key):
+        self.__api_key = secret_key # Double underscore signals private variable
+        
+    def get_secure_masked_key(self):
+        # Slice safely to avoid throwing errors if key is too short
+        return f"{self.__api_key[:4]}****"
+
+# Testing the implementation
+client = SecureClient("sk-live987654321xyz")
+print(client.get_secure_masked_key()) # Output: sk-l****
+# print(client.__api_key) # This line would raise an AttributeError
+
+# 8. Readable Logs: Overriding Dunder Methods 🟢 (Easy)
+# Problem Statement:
+# Printing objects directly yields unreadable memory pointers like <__main__.Agent object at 0x... >.
+#  Create an Agent class that overrides the standard double-underscore string method __str__ so that 
+# when passed directly into a print() statement, it explicitly outputs "Agent instance named: [name]".
+
+# Solution:
+
+class Agent:
+    def __init__(self, name):
+        self.name = name
+        
+    def __str__(self):
+        # Intercepts standard string formatting representation
+        return f"Agent instance named: {self.name}"
+
+# Testing the implementation
+log_agent = Agent("Echo")
+print(log_agent) 
+# Output: Agent instance named: Echo
+
+
+# 9. Custom Math: Arithmetic Dunder Overloading 🟡 (Medium)
+# Problem Statement:
+# If two independent agents work on a problem sequentially, we might want 
+# to "add" their processing histories together. Build an AgentHistory class that 
+# takes a list of strings called logs at initialization. Implement the __add__ dunder
+#  method so that writing history1 + history2 creates and returns a brand-new AgentHistory 
+# containing the combined lists.
+
+# solution:
+
+class AgentHistory:
+    def __init__(self, logs):
+        self.logs = logs
+        
+    def __add__(self, other):
+        # Return a brand new instance of the same class type 
+        combined_logs = self.logs + other.logs
+        return AgentHistory(combined_logs)
+
+# Testing the implementation
+h1 = AgentHistory(["Started search", "Found matching files"])
+h2 = AgentHistory(["Parsed items", "Finished task"])
+h3 = h1 + h2
+print(h3.logs)
+# Output: ['Started search', 'Found matching files', 'Parsed items', 'Finished task']
+
+# 10. Plugin Architecture: Polymorphism via Shared Interface 🟡 (Medium)
+# Problem Statement:
+# Agents interact with environments using varying tools (e.g., a Calculator tool or a
+#  Web-Search tool). Demonstrate polymorphism by creating two different tool classes: 
+# CalculatorTool and WebSearchTool. Ensure both implement a method with the exact same name:
+#  call(query).CalculatorTool.call(query) returns "Calculating math for: [query]"WebSearchTool.call(query)
+#  returns "Searching internet indices for: [query]"Write a standard Python function (outside the classes) 
+# called use_plugin(tool_object, query) that runs the object's call method agnostic of its type.
+
+# Solution:
+
+class CalculatorTool:
+    def call(self, query):
+        return f"Calculating math for: {query}"
+
+class WebSearchTool:
+    def call(self, query):
+        return f"Searching internet indices for: {query}"
+
+# Polymorphic runner function accepting any class with a .call() interface
+def use_plugin(tool_object, query):
+    return tool_object.call(query)
+
+# Testing the implementation
+calc = CalculatorTool()
+search = WebSearchTool()
+
+print(use_plugin(calc, "5 + 5"))       # Output: Calculating math for: 5 + 5
+print(use_plugin(search, "AI news"))   # Output: Searching internet indices for: AI news

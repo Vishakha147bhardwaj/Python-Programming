@@ -409,3 +409,218 @@ search = WebSearchTool()
 
 print(use_plugin(calc, "5 + 5"))       # Output: Calculating math for: 5 + 5
 print(use_plugin(search, "AI news"))   # Output: Searching internet indices for: AI news
+
+
+# 🌐 Topic 1: Working with APIs & Web ScrapingQuestion 
+# 1: Scraping and Filtering Items
+# Problem Statement:
+# Write a function get_highly_rated_books(url) using requests and BeautifulSoup.
+#  Parse the given URL to find all book elements (<article class="book_pod">). 
+# Extract and return a list of titles of books that have a class of either "star-rating Four"
+#  or "star-rating Five".
+
+# Solution:
+import requests
+from bs4 import BeautifulSoup
+
+def get_highly_rated_books(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    titles = []
+    # Find all book article elements
+    books = soup.find_all('article', class_='book_pod')
+    
+    for book in books:
+        # Check if the star-rating class matches Four or Five
+        if book.find(class_='star-rating Four') or book.find(class_='star-rating Five'):
+            # Extract title from the anchor tag inside the h3 element
+            title = book.h3.a['title']
+            titles.append(title)
+            
+    return titles
+
+
+# Question 2: Multi-Page Scraping with CSS Selectors
+# Problem Statement:
+# Write a Python script that uses a CSS selector (select()) to scrape text from all paragraphs
+#  (p.content) across the first 3 pages of a paginated blog. The base URL structure is https://example-blog.com. 
+# Return all extracted paragraphs in a single flat list.
+
+# Solution:
+import requests
+from bs4 import BeautifulSoup
+
+def scrape_blog_paragraphs(base_url):
+    all_paragraphs = []
+    
+    for page in range(1, 4):
+        response = requests.get(f"{base_url}{page}")
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Use CSS selector to extract matching paragraph structures
+        elements = soup.select('p.content')
+        for el in elements:
+            all_paragraphs.append(el.get_text())
+            
+    return all_paragraphs
+
+# Question 3: Authenticated POST Request with Error Handling
+# Problem Statement:Write a function submit_agent_payload(api_url, token, payload) that 
+# sends a POST request to an API endpoint. Pass the token inside the HTTP headers as 
+# {"Authorization": f"Bearer {token}"} and send the payload data as JSON. 
+# If the response status code is not 201, raise a RuntimeError displaying the status code received.
+
+# Solution:
+import requests
+
+def submit_agent_payload(api_url, token, payload):
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Send POST request converting payload payload to JSON automatically
+    response = requests.post(api_url, headers=headers, json=payload)
+    
+    if response.status_code != 201:
+        raise RuntimeError(f"Failed submission. Status code received: {response.status_code}")
+        
+    return response.json()
+
+# Question 4: URL Parameter Configuration
+# Problem Statement:
+# Write a script using the requests library to fetch data from https://weather.com. 
+# Configure the request dynamically using the params dictionary argument to pass the 
+# following key-value pairs: location="Delhi", units="metric", and limit=5. Return the 
+# raw JSON payload response.
+
+# Solution:
+
+import requests
+
+def fetch_weather_data():
+    url = "https://weather.com"
+    query_params = {
+        "location": "Delhi",
+        "units": "metric",
+        "limit": 5
+    }
+    
+    response = requests.get(url, params=query_params)
+    return response.json()
+
+
+
+# Question 5: Programmatic Robots.txt Compliance Check
+# Problem Statement:
+# Write a Python function is_scraping_allowed(url, user_agent="*") using Python's built-in urllib.
+# robotparser. The function must read the robots.txt file located at the domain root of the input
+#  URL and return a boolean indicating whether the specified User-Agent is permitted to scrape that path.
+
+# Solution:
+from urllib.robotparser import RobotFileParser
+from urllib.parse import urlparse
+
+def is_scraping_allowed(url, user_agent="*"):
+    parsed_url = urlparse(url)
+    # Reconstruct base scheme and network location root for robots.txt positioning
+    robots_url = f"{parsed_url.scheme}://{parsed_url.netloc}/robots.txt"
+    
+    rp = RobotFileParser()
+    rp.set_url(robots_url)
+    rp.read()
+    
+    return rp.can_fetch(user_agent, url)
+
+
+# 🧵 Topic 2: Strings & String Methods
+# Question 6: Parsing and Rebuilding Log Data
+# Problem Statement:
+# You are given a raw log string: "[ERROR] :: 2026-09-01 :: Connection failed  \n". 
+# Write a function clean_and_split_log(log_str) that strips whitespace, splits the 
+# log by the :: delimiter, removes empty padding from each token, and returns a tuple 
+# in the format: (status, date, message).
+
+# Solution:
+def clean_and_split_log(log_str):
+    # Strip leading/trailing whitespaces and newlines
+    cleaned = log_str.strip()
+    # Split tokens strictly by the double colon identifier
+    tokens = cleaned.split("::")
+    # Clean whitespace padding out of individual extracted sub-strings
+    final_tokens = [token.strip() for token in tokens]
+    
+    return (final_tokens[0], final_tokens[1], final_tokens[2])
+
+
+# Question 7: Dynamic Few-Shot Prompt Template
+# Problem Statement:
+# Write a function generate_few_shot_prompt(examples, system_role) where examples is a
+#  list of tuples containing user/assistant pairs (e.g., [("Hi", "Hello"), ("Bye", "Goodbye")]).
+#  Use f-strings and .join() to construct a single string block formatted exactly as a chat model
+#  prompt container, appending the system_role at the top.
+
+# Solution:
+def generate_few_shot_prompt(examples, system_role):
+    # Map raw examples list to consistent layout formatting structures
+    formatted_examples = [
+        f"User: {pair[0]}\nAssistant: {pair[1]}" for pair in examples
+    ]
+    # Build text block dynamically using string joins
+    examples_block = "\n---\n".join(formatted_examples)
+    
+    return f"System: {system_role}\n\nExamples:\n{examples_block}"
+
+
+# Question 8: Anonymizing Private Entities
+# Problem Statement:
+# Write a function redact_api_keys(prompt_text) that finds instances of keys structured 
+# as "sk-proj-" followed by 8 alphanumeric characters (e.g., sk-proj-abc123xyz). 
+# Replace the entire sequence with the string "[[REDACTED]]" programmatically using
+#  structural string operations or string slicing methods.
+
+# Solution:
+def redact_api_keys(prompt_text):
+    while "sk-proj-" in prompt_text:
+        idx = prompt_text.find("sk-proj-")
+        # Extract target window slice boundaries (prefix + 8 characters)
+        target_slice = prompt_text[idx:idx + 16]
+        prompt_text = prompt_text.replace(target_slice, "[[REDACTED]]")
+        
+    return prompt_text
+
+# Question 9: Structural CSV Line Transformer
+# Problem Statement:
+# Write a function transform_csv_row(csv_line) that takes a single comma-separated text string representing
+#  a row (e.g., "agent_01,  active ,gpt-4 "). Clean up individual item padding using string mutations, 
+# replace instances of "gpt-4" with "gpt-4o", and join the elements back together using a pipe delimiter (|) 
+# instead of a comma.
+
+# Solution:
+def transform_csv_row(csv_line):
+    # Split text line by default comma separations
+    elements = csv_line.split(",")
+    # Strip individual string element boundaries
+    cleaned_elements = [el.strip() for el in elements]
+    
+    # Process modifications on targets inside collection elements list
+    transformed = [
+        "gpt-4o" if item == "gpt-4" else item for item in cleaned_elements
+    ]
+    
+    # Pack items together using modern pipe sequence character
+    return "|".join(transformed)
+
+
+# Question 10: Dynamic JSON-Prompt Builder
+# Problem Statement:
+# Given a string template representing a structured JSON prompt: "{'task': '{task_name}', 'temperature': {temp}}"
+#  and a multi-line code string. Write a Python snippet that safely formats the template using explicit variable 
+# injection, doubling necessary structural brackets so it returns a valid JSON-like prompt string without triggering
+#  a KeyError.
+
+# Solution:
+def build_json_prompt(task_name, temp):
+    # Escape structural dictionary literal curly brackets by doubling them up
+    template = "{{'task': '{task_name}', 'temperature': {temp}}}"
+    
+    # Inject variables dynamically into parameters safely
+    return template.format(task_name=task_name, temp=temp)

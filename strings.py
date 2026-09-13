@@ -1,4 +1,13 @@
+first = 'apple'
+print(first[2])
+
+print(first[4])
+
+# slicing [start:end:step]
+print(first[1:4:1]) 
+
 # single = 'Hello'
+
 # double = "World"
 # multi_line = """This string spans
 # multiple lines."""
@@ -50,8 +59,8 @@
 # print(message)
 # print(y)
 # print(f'my name is {name}')
-result = '60%'
-print(f'My result is {result}')
+# result = '60%'
+# print(f'My result is {result}')
 # # step based slicing
 # text = "Hello, World!" 
 # print(text[1::3])  

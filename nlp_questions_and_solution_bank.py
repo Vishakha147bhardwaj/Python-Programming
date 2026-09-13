@@ -65,6 +65,7 @@ print(filter_and_stem(test_tokens))
 # Use spaCy's en_core_web_sm model to process a sentence. 
 # Loop through the tokens and extract only the words whose part-of-speech 
 # tag (.pos_) is classified as either a NOUN or a VERB.
+from openai import OpenAI
 import spacy
 
 def extract_nouns_and_verbs(text: str) -> list:
@@ -428,3 +429,136 @@ print(router.route_query("What is the difference between VADER and HuggingFace?"
 # Output: Sent to Knowledge Base RAG Pipeline
 print(router.route_query("Purchase premium API access keys"))
 # Output: Sent to Sales Pipeline
+
+
+# 🧠 Topic: Introduction to Large Language Models (LLMs)
+# Question 1: Text Tokenization and Context Window Slicing
+# Problem Statement:Write a Python function slice_to_context_window(text, max_tokens, model_name="gpt-4o")
+#  using the tiktoken library. The function must tokenize the raw input string, determine if the token count
+#  exceeds max_tokens, and if so, slice the token array to fit exactly within the limit before decoding it 
+# back into a clean string.
+
+# Solution:
+import tiktoken
+
+def slice_to_context_window(text, max_tokens, model_name="gpt-4o"):
+    # Dynamically fetch the encoding tokenizer target for the model
+    encoding = tiktoken.encoding_for_model(model_name)
+    tokens = encoding.encode(text)
+    
+    # Check window size constraints and slice text array if necessary
+    if len(tokens) > max_tokens:
+        tokens = tokens[:max_tokens]
+        
+    return encoding.decode(tokens)
+
+# Question 2: OpenAI API Hyperparameter Temperature and Top-P Controls
+# Problem Statement:
+# Write a Python function call_llm_with_sampling(prompt, temperature, top_p) using 
+# the modern openai Python SDK (v1.0.0+). Configure the client to pass the input prompt
+#  into a gpt-4o-mini chat completion model, overriding default generation variables dynamically
+#  using the provided parameters. Return the plaintext content of the response.
+
+from openai import OpenAI
+
+def call_llm_with_sampling(prompt, temperature, top_p):
+    # Initializes client using environment variable OPENAI_API_KEY implicitly
+    client = OpenAI()
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=temperature,  # Controls randomness/creativity spectrum
+        top_p=top_p              # Controls nucleus sampling boundaries
+    )
+    return response.choices[0].message.content
+
+
+# Question 3: Dynamic Chain-of-Thought Few-Shot Prompt Builder
+# Problem Statement:
+# Write a function build_reasoning_prompt(question, examples) where examples 
+# is a list of dictionaries containing prior math puzzles (keys: "q", "thought", "a").
+#  Use structural f-strings to dynamically assemble a Few-Shot Chain-of-Thought (CoT)
+#  prompt container ensuring it ends with a structured instruction forcing the model 
+# to write out its intermediate reasoning steps.
+
+# Solution:
+def build_reasoning_prompt(question, examples):
+    prompt_segments = ["System: Solve the problem using step-by-step logic.\n"]
+    
+    # Iteratively append explicit Few-Shot exemplars detailing thought pathways
+    for ex in examples:
+        prompt_segments.append(
+            f"Question: {ex['q']}\nReasoning: {ex['thought']}\nAnswer: {ex['a']}"
+        )
+    
+    # Inject final execution target containing the new question block
+    prompt_segments.append(
+        f"Question: {question}\nReasoning: Let's think step by step."
+    )
+    
+    return "\n\n---\n\n".join(prompt_segments)
+
+# Question 4: Abstractive Summarisation vs. Topic Modelling with LDA
+# Problem Statement:
+# Given a tokenized list of text documents, write a Python function 
+# extract_lda_topics(tokenized_docs, num_topics=3) using gensim. 
+# Build a Dictionary corpus object, construct a Bag-of-Words (BoW) 
+# frequency matrix mapping, and train a LdaModel. Return a structured 
+# list containing the primary keyword distributions identifying the requested 
+# number of latent topics.
+
+# Solution:
+from gensim.corpora import Dictionary
+from gensim.models import LdaModel
+
+def extract_lda_topics(tokenized_docs, num_topics=3):
+    # Mapping corpus tokens to an indexed token id vocabulary matrix
+    dictionary = Dictionary(tokenized_docs)
+    corpus = [dictionary.doc2bow(doc) for doc in tokenized_docs]
+    
+    # Train the Latent Dirichlet Allocation statistical structure
+    lda = LdaModel(
+        corpus=corpus, 
+        id2word=dictionary, 
+        num_topics=num_topics, 
+        passes=10, 
+        random_state=42
+    )
+    
+    # Extract string representations of hidden semantic keyword topics
+    return lda.print_topics(num_topics=num_topics, num_words=5)
+
+
+# Question 5: Programmatic NLP Evaluation Metrics: BLEU and ROUGE
+# Problem Statement:
+# Write a Python function evaluate_output_quality(candidate, reference) using 
+# evaluate or standard nltk and rouge_score libraries. The function must calculate 
+# and return a dictionary containing two specific evaluation metrics: the BLEU score 
+# (sentence level) and the ROUGE-L F1-score comparing the model output against the reference string.
+
+# Solution:
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
+
+def evaluate_output_quality(candidate, reference):
+    # Tokenize words for standard NLTK sentence-level calculations
+    candidate_tokens = candidate.split()
+    reference_tokens = [reference.split()]
+    
+    # Compute BLEU with smoothing to handle short strings gracefully
+    smoother = SmoothingFunction().method1
+    bleu = sentence_bleu(reference_tokens, candidate_tokens, smoothing_function=smoother)
+    
+    # Set up and evaluate ROUGE metrics (specifically extraction-based longest common subsequence)
+    scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=True)
+    scores = scorer.score(reference, candidate)
+    rouge_l_f1 = scores['rougeL'].fmeasure
+    
+    return {
+        "bleu_score": bleu,
+        "rouge_l_f1_score": rouge_l_f1
+    }

@@ -263,10 +263,10 @@ print(~a)
 # b = 8
 # print(a & b)
 # bitwise left shift (<<) operator shifts the bits of its operand to the left by a specified number of positions. It fills the rightmost bits with zeros. For example, if we have a number 5 (0101 in binary) and we apply a left shift of 2 positions, we get 20 (10100 in binary).
-a = 5 << 2 = 5* 2**2 = 5*4 = 20
-b = 5<<3 = 5* 2**3 = 5*8 = 40
-c = 5>>2 = 5// 2**2 = 5//4 = 1
-d = 5>>3 = 5//2**3 = 5//8 = 0
+# a = 5 << 2 = 5* 2**2 = 5*4 = 20
+# b = 5<<3 = 5* 2**3 = 5*8 = 40
+# c = 5>>2 = 5// 2**2 = 5//4 = 1
+# d = 5>>3 = 5//2**3 = 5//8 = 0
 # 5 >> n = 5//2**n
 # 5<<n = 5* 2**n
 # bitwise xor ^

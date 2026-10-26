@@ -12,6 +12,7 @@ GROUP BY category
 HAVING SUM(price) > 100.00
 """)
 
+
 rows = cursor.fetchall()
 
 print("--- High-Performing Categories (Over $100 Sales) ---")

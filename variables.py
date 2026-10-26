@@ -13,20 +13,20 @@
 # user_agent = 'ai'
 # age = 20
 # print(age)
-# _name = 'Rupesh'
+# _name = 'Poonam'
 # print(_name)
-# score = 10
-# print(type(score))
-# score = '10'
-# print(type(score))
-# score = 10.2
-# print(type(score))
-# score = True
-# print(type(score))
-# score = [10,20,20.3]
-# print(type(score))
-# score = (10,30)
-# print(type(score))
-# score = {'10':20}
-# print(type(score))
+score = 10
+print(type(score))
+score = '10'
+print(type(score))
+score = 10.2
+print(type(score))
+score = True
+print(type(score))
+score = [10,20,20.3]
+print(type(score))
+score = (10,30)
+print(type(score))
+score = {'10':20}
+print(type(score))
 

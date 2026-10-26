@@ -1,5 +1,8 @@
 {
-    "theme": "dark",
-    "version": 2.1,
-    "auto_update": false
+    "theme": "Dark",
+    "autoclose_timeout": 300,
+    "user_preferences": {
+        "notifications": true,
+        "font_size": "Medium"
+    }
 }

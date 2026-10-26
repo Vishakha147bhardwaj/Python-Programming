@@ -35,6 +35,7 @@ results = cursor.fetchall()
         #  'Bob'     IT
         #  'Charlie' Sales
         #  'Diana'   HR
+print(results)
 print("--- Simple Select Output ---")
 for row in results:
     print(f"Employee: {row[0]} works in {row[1]}")

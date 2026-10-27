@@ -1,0 +1,7 @@
+=== CORPORATE SEO CONTENT PLAYBOOK ===
+
+RULE #1: TARGET METADATA STRATEGY
+Meta descriptions must remain between 120 and 155 characters. Every description must end with an explicit, high-conversion action verb CTA such as 'Download guide free' or 'Start trial today'. Never use vague assertions like 'Learn more here'.
+
+RULE #2: CORE WEB VITALS PERMANENT COMPLIANCE
+Image content must be uploaded in .webp format. No raw .png formats are allowed on high-traffic production landing web directories, to prevent degrading page speed metrics below compliance targets.
